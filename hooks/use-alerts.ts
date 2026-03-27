@@ -1,7 +1,13 @@
 "use client"
 
 import { useCallback, useRef } from "react"
+import { LocalNotifications } from "@capacitor/local-notifications"
 import { useGame } from "@/lib/game-context"
+import { isAndroidApp, isNativeApp } from "@/lib/native-device"
+
+const WARNING_NOTIFICATION_ID = 30001
+const END_NOTIFICATION_ID = 30002
+const NOTIFICATION_CHANNEL_ID = "round-timer-alerts"
 
 export function useAlerts() {
   const { state } = useGame()
@@ -96,6 +102,84 @@ export function useAlerts() {
     vibrateStart()
   }, [playStartSound, vibrateStart])
 
+  const requestNotificationPermission = useCallback(async () => {
+    if (!isNativeApp()) return
+    try {
+      const permissions = await LocalNotifications.requestPermissions()
+      if (permissions.display !== "granted") return
+      if (isAndroidApp()) {
+        await LocalNotifications.createChannel({
+          id: NOTIFICATION_CHANNEL_ID,
+          name: "Round Timer Alerts",
+          description: "Warning and completion signals for active round timers",
+          importance: 5,
+          vibration: true,
+          visibility: 1,
+        })
+      }
+    } catch {
+      // Ignore permission/channel errors
+    }
+  }, [])
+
+  const cancelRoundNotifications = useCallback(async () => {
+    if (!isNativeApp()) return
+    try {
+      await LocalNotifications.cancel({
+        notifications: [{ id: WARNING_NOTIFICATION_ID }, { id: END_NOTIFICATION_ID }],
+      })
+    } catch {
+      // Ignore cancellation errors
+    }
+  }, [])
+
+  const scheduleRoundNotifications = useCallback(async (endTimestampMs: number, warningSeconds = 30) => {
+    if (!isNativeApp()) return
+    if (!soundEnabled && !vibrationEnabled) return
+
+    const now = Date.now()
+    const warningAtMs = endTimestampMs - warningSeconds * 1000
+
+    try {
+      await requestNotificationPermission()
+      await cancelRoundNotifications()
+
+      const notifications: Array<{
+        id: number
+        title: string
+        body: string
+        schedule: { at: Date; allowWhileIdle: boolean }
+        channelId?: string
+      }> = []
+
+      if (warningAtMs > now) {
+        notifications.push({
+          id: WARNING_NOTIFICATION_ID,
+          title: "Noch 30 Sekunden",
+          body: "Eure Runde endet bald.",
+          schedule: { at: new Date(warningAtMs), allowWhileIdle: true },
+          channelId: NOTIFICATION_CHANNEL_ID,
+        })
+      }
+
+      if (endTimestampMs > now) {
+        notifications.push({
+          id: END_NOTIFICATION_ID,
+          title: "Runde beendet",
+          body: "Die 3 Minuten sind vorbei.",
+          schedule: { at: new Date(endTimestampMs), allowWhileIdle: true },
+          channelId: NOTIFICATION_CHANNEL_ID,
+        })
+      }
+
+      if (notifications.length > 0) {
+        await LocalNotifications.schedule({ notifications })
+      }
+    } catch {
+      // Ignore scheduling errors
+    }
+  }, [cancelRoundNotifications, requestNotificationPermission, soundEnabled, vibrationEnabled])
+
   return {
     playTone,
     playCompletionSound,
@@ -108,5 +192,8 @@ export function useAlerts() {
     alertCompletion,
     alertWarning,
     alertStart,
+    requestNotificationPermission,
+    scheduleRoundNotifications,
+    cancelRoundNotifications,
   }
 }

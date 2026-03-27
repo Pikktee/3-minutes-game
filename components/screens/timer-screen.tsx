@@ -1,10 +1,13 @@
 "use client"
 
 import { useState, useEffect, useCallback, useRef } from "react"
+import { KeepAwake } from "@capacitor-community/keep-awake"
 import { Button } from "@/components/ui/button"
 import { useLocale } from "@/lib/locale-context"
 import { useGame, type GamePhase } from "@/lib/game-context"
 import { useAlerts } from "@/hooks/use-alerts"
+import { clearTimerSession, loadTimerSession, saveTimerSession } from "@/lib/timer-session"
+import { isNativeApp } from "@/lib/native-device"
 import { Pause, Play, SkipForward, Gift, Hand, Sparkles, Shield } from "lucide-react"
 
 const TIMER_DURATION = 180 // 3 minutes in seconds
@@ -13,14 +16,15 @@ const WARNING_TIME = 30 // Warning at 30 seconds remaining
 export function TimerScreen() {
   const { t } = useLocale()
   const { state, setPhase } = useGame()
-  const { alertCompletion, alertWarning, alertStart } = useAlerts()
-  const { phase, activePartner, partnerNames } = state
+  const { alertCompletion, alertWarning, alertStart, scheduleRoundNotifications, cancelRoundNotifications, requestNotificationPermission } = useAlerts()
+  const { phase, activePartner, partnerNames, settings } = state
   const [timeLeft, setTimeLeft] = useState(TIMER_DURATION)
   const [isPaused, setIsPaused] = useState(false)
   const [isComplete, setIsComplete] = useState(false)
-  const [hasStarted, setHasStarted] = useState(false)
-  const [hasWarnedRef] = useState({ current: false })
   const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const endTimestampRef = useRef<number>(0)
+  const hasWarnedRef = useRef(false)
+  const hasCompletedRef = useRef(false)
 
   const roundNumber = phase.includes("1") ? 1 : phase.includes("2") ? 2 : phase.includes("3") ? 3 : 4
   const isServeAccept = phase === "round1-timer" || phase === "round3-timer"
@@ -44,51 +48,172 @@ export function TimerScreen() {
     }
   }
 
-  const handleComplete = useCallback(() => {
+  const handleComplete = useCallback(async () => {
+    if (hasCompletedRef.current) return
+    hasCompletedRef.current = true
     setIsComplete(true)
-    alertCompletion()
-  }, [alertCompletion])
-
-  // Start the timer automatically on mount with a start sound
-  useEffect(() => {
-    if (!hasStarted) {
-      setHasStarted(true)
-      alertStart()
+    setTimeLeft(0)
+    await clearTimerSession()
+    await cancelRoundNotifications()
+    if (isNativeApp()) {
+      await KeepAwake.allowSleep().catch(() => undefined)
     }
-  }, [hasStarted, alertStart])
+    alertCompletion()
+  }, [alertCompletion, cancelRoundNotifications])
+
+  const getSecondsUntilEnd = useCallback(() => {
+    const remainingMs = endTimestampRef.current - Date.now()
+    return Math.max(0, Math.ceil(remainingMs / 1000))
+  }, [])
+
+  const persistActiveRound = useCallback(async (paused: boolean, pausedRemainingSeconds: number | null = null) => {
+    await saveTimerSession({
+      phase,
+      endTimestampMs: endTimestampRef.current,
+      isPaused: paused,
+      pausedRemainingSeconds,
+    })
+  }, [phase])
+
+  const startNewRound = useCallback(async () => {
+    hasCompletedRef.current = false
+    hasWarnedRef.current = false
+    setIsComplete(false)
+    setIsPaused(false)
+    setTimeLeft(TIMER_DURATION)
+
+    endTimestampRef.current = Date.now() + TIMER_DURATION * 1000
+    await persistActiveRound(false)
+    await scheduleRoundNotifications(endTimestampRef.current, WARNING_TIME)
+    await requestNotificationPermission()
+    alertStart()
+  }, [alertStart, persistActiveRound, requestNotificationPermission, scheduleRoundNotifications])
+
+  const recalculateFromRealTime = useCallback(async () => {
+    if (isPaused || isComplete) return
+    const remaining = getSecondsUntilEnd()
+
+    if (remaining <= WARNING_TIME && remaining > 0 && !hasWarnedRef.current) {
+      hasWarnedRef.current = true
+      alertWarning()
+    }
+
+    if (remaining <= 0) {
+      await handleComplete()
+      return
+    }
+
+    setTimeLeft(remaining)
+  }, [alertWarning, getSecondsUntilEnd, handleComplete, isComplete, isPaused])
 
   useEffect(() => {
-    if (!isPaused && timeLeft > 0) {
+    let isCancelled = false
+
+    const restoreOrStart = async () => {
+      const persisted = await loadTimerSession()
+      if (isCancelled) return
+
+      if (persisted && persisted.phase === phase) {
+        hasCompletedRef.current = false
+        endTimestampRef.current = persisted.endTimestampMs
+        setIsPaused(persisted.isPaused)
+        setIsComplete(false)
+
+        if (persisted.isPaused) {
+          setTimeLeft(persisted.pausedRemainingSeconds ?? TIMER_DURATION)
+          return
+        }
+
+        const remaining = Math.max(0, Math.ceil((persisted.endTimestampMs - Date.now()) / 1000))
+        setTimeLeft(remaining)
+        if (remaining <= 0) {
+          await handleComplete()
+        }
+        return
+      }
+
+      await startNewRound()
+    }
+
+    void restoreOrStart()
+
+    return () => {
+      isCancelled = true
+    }
+  }, [handleComplete, phase, startNewRound])
+
+  useEffect(() => {
+    if (!isPaused && !isComplete) {
       timerRef.current = setInterval(() => {
-        setTimeLeft((prev) => {
-          // Warning at 30 seconds
-          if (prev === WARNING_TIME + 1 && !hasWarnedRef.current) {
-            hasWarnedRef.current = true
-            alertWarning()
-          }
-          
-          if (prev <= 1) {
-            if (timerRef.current) clearInterval(timerRef.current)
-            handleComplete()
-            return 0
-          }
-          return prev - 1
-        })
-      }, 1000)
+        void recalculateFromRealTime()
+      }, 250)
     }
 
     return () => {
       if (timerRef.current) clearInterval(timerRef.current)
     }
-  }, [isPaused, handleComplete, alertWarning, hasWarnedRef])
+  }, [isPaused, isComplete, recalculateFromRealTime])
 
-  const togglePause = () => {
-    setIsPaused(!isPaused)
+  useEffect(() => {
+    const handleVisibilityOrFocus = () => {
+      void recalculateFromRealTime()
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityOrFocus)
+    window.addEventListener("focus", handleVisibilityOrFocus)
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityOrFocus)
+      window.removeEventListener("focus", handleVisibilityOrFocus)
+    }
+  }, [recalculateFromRealTime])
+
+  useEffect(() => {
+    if (!isNativeApp()) return
+    const shouldKeepAwake = settings.keepScreenOn && !isPaused && !isComplete
+
+    if (shouldKeepAwake) {
+      void KeepAwake.keepAwake().catch(() => undefined)
+    } else {
+      void KeepAwake.allowSleep().catch(() => undefined)
+    }
+  }, [isComplete, isPaused, settings.keepScreenOn])
+
+  useEffect(() => {
+    return () => {
+      if (!isNativeApp()) return
+      void KeepAwake.allowSleep().catch(() => undefined)
+    }
+  }, [])
+
+  const togglePause = async () => {
+    if (isComplete) return
+
+    if (isPaused) {
+      endTimestampRef.current = Date.now() + timeLeft * 1000
+      setIsPaused(false)
+      await persistActiveRound(false)
+      await scheduleRoundNotifications(endTimestampRef.current, WARNING_TIME)
+      return
+    }
+
+    const remaining = getSecondsUntilEnd()
+    setTimeLeft(remaining)
+    setIsPaused(true)
+    await persistActiveRound(true, remaining)
+    await cancelRoundNotifications()
   }
 
   const skipRound = () => {
     if (timerRef.current) clearInterval(timerRef.current)
     setPhase(getNextPhase())
+    void (async () => {
+      await clearTimerSession()
+      await cancelRoundNotifications()
+      if (isNativeApp()) {
+        await KeepAwake.allowSleep().catch(() => undefined)
+      }
+    })()
   }
 
   const formatTime = (seconds: number) => {

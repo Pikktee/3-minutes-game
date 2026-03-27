@@ -116,6 +116,14 @@ pnpm start
 pnpm lint
 ```
 
+## Android
+
+Fuer Android-Testumgebung, Emulator, Tests und internes Release:
+
+- `docs/android-setup.md`
+- `docs/android-test-matrix.md`
+- `docs/android-internal-release.md`
+
 ## Ausblick
 
 Moegliche naechste Schritte:

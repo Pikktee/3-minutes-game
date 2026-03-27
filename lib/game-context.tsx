@@ -21,6 +21,7 @@ export type GamePhase =
 interface GameSettings {
   soundEnabled: boolean
   vibrationEnabled: boolean
+  keepScreenOn: boolean
 }
 
 interface PartnerNames {
@@ -46,6 +47,7 @@ interface GameContextType {
   getPartnerName: (partner: "A" | "B") => string
   toggleSound: () => void
   toggleVibration: () => void
+  toggleKeepScreenOn: () => void
   resetGame: () => void
 }
 
@@ -61,6 +63,7 @@ const initialState: GameState = {
   settings: {
     soundEnabled: true,
     vibrationEnabled: true,
+    keepScreenOn: true,
   },
 }
 
@@ -155,6 +158,13 @@ export function GameProvider({ children }: { children: ReactNode }) {
     }))
   }, [])
 
+  const toggleKeepScreenOn = useCallback(() => {
+    setState((prev) => ({
+      ...prev,
+      settings: { ...prev.settings, keepScreenOn: !prev.settings.keepScreenOn },
+    }))
+  }, [])
+
   const resetGame = useCallback(() => {
     setState((prev) => ({
       ...initialState,
@@ -173,6 +183,7 @@ export function GameProvider({ children }: { children: ReactNode }) {
         getPartnerName,
         toggleSound,
         toggleVibration,
+        toggleKeepScreenOn,
         resetGame,
       }}
     >

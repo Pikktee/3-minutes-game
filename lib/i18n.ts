@@ -119,6 +119,8 @@ export const translations = {
     soundOff: "Sound Off",
     vibrationOn: "Vibration On",
     vibrationOff: "Vibration Off",
+    keepScreenOn: "Keep Screen On",
+    keepScreenOnOff: "Allow Screen Sleep",
 
     // About
     aboutTitle: "About the 3-Minute Game",
@@ -285,6 +287,8 @@ export const translations = {
     soundOff: "Ton aus",
     vibrationOn: "Vibration an",
     vibrationOff: "Vibration aus",
+    keepScreenOn: "Bildschirm anhalten",
+    keepScreenOnOff: "Bildschirm darf ausgehen",
 
     // About
     aboutTitle: "Über das 3-Minuten-Spiel",

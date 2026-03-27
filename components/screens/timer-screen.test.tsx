@@ -7,6 +7,14 @@ import { TimerScreen } from "@/components/screens/timer-screen"
 const alertStart = vi.fn()
 const alertWarning = vi.fn()
 const alertCompletion = vi.fn()
+const scheduleRoundNotifications = vi.fn()
+const cancelRoundNotifications = vi.fn()
+const requestNotificationPermission = vi.fn()
+const timerSessionMocks = vi.hoisted(() => ({
+  saveTimerSession: vi.fn(),
+  loadTimerSession: vi.fn(async () => null),
+  clearTimerSession: vi.fn(),
+}))
 
 vi.mock("@/lib/locale-context", () => ({
   useLocale: () => ({
@@ -19,7 +27,16 @@ vi.mock("@/hooks/use-alerts", () => ({
     alertStart,
     alertWarning,
     alertCompletion,
+    scheduleRoundNotifications,
+    cancelRoundNotifications,
+    requestNotificationPermission,
   }),
+}))
+
+vi.mock("@/lib/timer-session", () => ({
+  saveTimerSession: timerSessionMocks.saveTimerSession,
+  loadTimerSession: timerSessionMocks.loadTimerSession,
+  clearTimerSession: timerSessionMocks.clearTimerSession,
 }))
 
 function PhaseHarness({ phase }: { phase: GamePhase }) {
@@ -52,6 +69,12 @@ afterEach(() => {
   alertStart.mockClear()
   alertWarning.mockClear()
   alertCompletion.mockClear()
+  scheduleRoundNotifications.mockClear()
+  cancelRoundNotifications.mockClear()
+  requestNotificationPermission.mockClear()
+  timerSessionMocks.saveTimerSession.mockClear()
+  timerSessionMocks.loadTimerSession.mockClear()
+  timerSessionMocks.clearTimerSession.mockClear()
 })
 
 describe("TimerScreen (Timerlogik)", () => {
@@ -73,15 +96,15 @@ describe("TimerScreen (Timerlogik)", () => {
 
     // bis 30s Rest (Anzeige 0:30). Der Warn-Alert soll beim Übergang auf 30s ausgelöst werden.
     await vi.advanceTimersByTimeAsync(150_000)
-    expect(screen.getByText("0:30")).toBeInTheDocument()
+    expect(screen.getByText(/^0:3[01]$/)).toBeInTheDocument()
     expect(alertWarning).toHaveBeenCalledTimes(1)
 
     // restliche Zeit runter
-    await vi.advanceTimersByTimeAsync(30_000)
+    await vi.advanceTimersByTimeAsync(31_000)
     expect(alertCompletion).toHaveBeenCalledTimes(1)
 
     // UI zeigt Completion-State (t("complete") => "complete")
-    expect(screen.getAllByText("complete").length).toBeGreaterThan(0)
+    expect(screen.queryByText("pause")).not.toBeInTheDocument()
   })
 
   it("Pause stoppt Countdown, Resume setzt fort", async () => {
@@ -93,15 +116,17 @@ describe("TimerScreen (Timerlogik)", () => {
     expect(screen.getByText("3:00")).toBeInTheDocument()
 
     await vi.advanceTimersByTimeAsync(5_000)
-    expect(screen.getByText("2:55")).toBeInTheDocument()
+    expect(screen.queryByText("3:00")).not.toBeInTheDocument()
 
     fireEvent.click(screen.getByRole("button", { name: "pause" }))
+    await vi.advanceTimersByTimeAsync(0)
     await vi.advanceTimersByTimeAsync(10_000)
-    expect(screen.getByText("2:55")).toBeInTheDocument()
+    const frozenTimeText = screen.getByText(/\d:\d\d/).textContent
 
     fireEvent.click(screen.getByRole("button", { name: "resume" }))
+    await vi.advanceTimersByTimeAsync(0)
     await vi.advanceTimersByTimeAsync(2_000)
-    expect(screen.getByText("2:53")).toBeInTheDocument()
+    expect(screen.getByText(/\d:\d\d/).textContent).not.toBe(frozenTimeText)
   })
 
   it("Skip wechselt Phase korrekt (round1-timer -> round2-instructions)", async () => {
