@@ -120,9 +120,7 @@ pnpm lint
 
 Moegliche naechste Schritte:
 
-- Persistenz des Spielstands zwischen Sessions
 - explizitere Safety-/Consent-Checkpoints vor jeder Runde
-- optionale Moderationsmodi (stiller Modus, angepasste Rundenlaengen)
 - automatisierte Tests fuer Phasenwechsel und Timerlogik
 
 ## Credits

@@ -22,7 +22,7 @@ Mit jeder dieser Fragen machst du ein Angebot an den Partner. Dadurch entstehen 
 ### 1. Nehmen / Erlauben
 
 | Begriff | Bedeutung |
-|---|---|
+| --- | --- |
 | **Nehmen** | Ich nehme etwas, das ich möchte, um mir selbst Vergnügen zu bereiten. |
 | **Erlauben** | Ich weiß, dass es dem anderen Vergnügen bereitet, und ich möchte, dass er das genießen kann. Es ist ein Geschenk. |
 
@@ -68,6 +68,7 @@ Die Hände besitzen, mit Ausnahme von Lippen und Genitalien, die **höchste Nerv
 5. Erst beobachten, was die Hände machen. Dann Augen schließen und sich nur auf das Fühlen konzentrieren.
 
 **Hinweise:**
+
 - Langsamer = mehr fühlen.
 - Jede Art von Anstrengung vermeiden – sonst ist das Nervensystem im Arbeitsmodus.
 - Sich die Zeit nehmen, die es braucht (auch 40 Minuten oder mehr).
@@ -90,11 +91,11 @@ Die Hände besitzen, mit Ausnahme von Lippen und Genitalien, die **höchste Nerv
 
 ## Lektion 2 – Nehmen und Erlauben (Die erste Dynamik)
 
-### Kernfrage
+### Kernfrage (Lektion 2)
 
 > *Wie möchtest du mich berühren?*
 
-### Struktur
+### Struktur (Lektion 2)
 
 1. Eine Person fragt: *„Darf ich deine Hände in dieser oder jener Weise erfühlen?"*
 2. Wenn einverstanden: *„Ja, du darfst."*
@@ -110,12 +111,14 @@ Die Hände besitzen, mit Ausnahme von Lippen und Genitalien, die **höchste Nerv
 Das Geschenk ist der **Zugriff auf den Anderen**.
 
 **Herausforderungen:**
+
 - Klare Sprache: *„Darf ich deine Hände erfühlen?"* – nicht *„Möchtest du, dass ich...?"*
 - Sich immer wieder fragen: **Für wen ist es?**
 - Aufmerksamkeit zurück zur Empfindung bringen, wenn man abschweift.
 - Am Ende: *„Danke"* sagen.
 
 **Was diese Rolle bringt:**
+
 - Qualität der Berührung erblüht (keine Technik, kein Ziel).
 - Tiefe Selbstakzeptanz.
 - Fähigkeit, klar nach dem zu fragen, was man möchte.
@@ -141,11 +144,11 @@ Das Geschenk ist der **Zugriff auf den eigenen Körper**.
 
 Diese Dynamik fühlt sich „normaler" an, da sie häufiger im Alltag vorkommt.
 
-### Kernfrage
+### Kernfrage (Lektion 3)
 
 > *Wie möchtest du von mir berührt werden?*
 
-### Struktur
+### Struktur (Lektion 3)
 
 1. Dienender fragt: *„Wie möchtest du, dass ich deine Hände berühre?"*
 2. Warten auf Antwort.
@@ -164,6 +167,7 @@ Es geht um das Empfangen als **Geschenk annehmen** – nicht um bloßes Erleiden
 **Herausforderung:** Merken, was man **genau jetzt** wirklich will. 100 % für sich.
 
 **Was man lernt:**
+
 - Es ist möglich, genauso berührt zu werden, wie man es möchte.
 - Respekt vor dem Partner und dem, was er bereit ist zu geben.
 - Das eigene Recht auf die eigene Erfahrung.
@@ -187,6 +191,7 @@ Das Geschenk ist **die Handlung** – und der Raum, in dem der Andere seine Wün
 2. *„Mit guter Technik hat man guten Sex."* → Falsch. Du musst **völlig präsent im Augenblick** sein. Technik ohne Präsenz ist kontraproduktiv.
 
 **Die Schritte:**
+
 1. Fragen: *„Wie möchtest du, dass ich deine Hände berühre?"* – Dem Anderen Zeit geben.
 2. Mindestens 20 Sekunden in sich gehen: *Bin ich bereit, das mit vollem Herzen zu geben?*
 3. Wenn ja: ausführen, exakt so wie vereinbart.
@@ -196,6 +201,7 @@ Das Geschenk ist **die Handlung** – und der Raum, in dem der Andere seine Wün
 7. Auf *„Danke"* nur mit *„Gern geschehen"* antworten.
 
 **Prinzipien:**
+
 - Du gibst deinem Partner keine Erfahrung – du bietest den **Raum**, in dem diese Erfahrung gemacht werden kann.
 - Was dich gut macht, ist keine Technik, sondern die Fähigkeit, **Informationen aufzunehmen** (verbal und taktil).
 - Die Qualität der Berührung hängt ab von Achtsamkeit, Präsenz und **entspannten Händen** – nicht von Technik.
@@ -211,7 +217,7 @@ Das Geschenk ist **die Handlung** – und der Raum, in dem der Andere seine Wün
 ### Die vier Quadranten
 
 | Quadrant | Wer handelt | Für wen | Schlüsselsatz |
-|---|---|---|---|
+| --- | --- | --- | --- |
 | **Nehmen** | Du | Für dich | *„Darf ich...?"* |
 | **Dienen** | Du | Für den Anderen | *„Ja, ich bin bereit."* |
 | **Erlauben** | Andere | Für den Anderen | *„Ja, du darfst."* |
@@ -249,4 +255,4 @@ Das Geschenk ist **die Handlung** – und der Raum, in dem der Andere seine Wün
 
 ---
 
-*© Dr. Betty Martin / www.bettymartin.org*
+*© Dr. Betty Martin / [www.bettymartin.org](https://www.bettymartin.org)*
