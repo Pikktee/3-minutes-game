@@ -38,13 +38,8 @@ export function HomeScreen() {
           {t("welcomeSubtitle")}
         </p>
 
-        {/* Attribution */}
-        <p className="text-sm text-muted-foreground/70 mb-12">
-          {t("byBettyMartin")}
-        </p>
-
         {/* Action Buttons */}
-        <div className="flex flex-col gap-4 w-full max-w-xs">
+        <div className="mt-10 flex flex-col gap-4 w-full max-w-xs">
           <Button
             size="lg"
             className="w-full text-lg py-6 rounded-xl"
