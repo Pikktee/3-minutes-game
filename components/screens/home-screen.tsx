@@ -1,15 +1,44 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { useLocale } from "@/lib/locale-context"
 import { useGame } from "@/lib/game-context"
 import { LanguageToggle } from "@/components/language-toggle"
 import { SettingsButton } from "@/components/settings-button"
+import { FirstRunOnboarding } from "@/components/first-run-onboarding"
 import { Heart, BookOpen } from "lucide-react"
+
+const FIRST_RUN_ONBOARDING_KEY = "hasSeenFirstRunOnboarding"
 
 export function HomeScreen() {
   const { t } = useLocale()
   const { setPhase } = useGame()
+  const [showOnboarding, setShowOnboarding] = useState(false)
+  const [hasCheckedOnboarding, setHasCheckedOnboarding] = useState(false)
+
+  useEffect(() => {
+    const hasSeenOnboarding = localStorage.getItem(FIRST_RUN_ONBOARDING_KEY)
+    if (!hasSeenOnboarding) {
+      setShowOnboarding(true)
+    }
+    setHasCheckedOnboarding(true)
+  }, [])
+
+  const markOnboardingSeen = () => {
+    localStorage.setItem(FIRST_RUN_ONBOARDING_KEY, "true")
+    setShowOnboarding(false)
+  }
+
+  const handleLearnBasics = () => {
+    markOnboardingSeen()
+    setPhase("learn")
+  }
+
+  const handleSkipToGame = () => {
+    markOnboardingSeen()
+    setPhase("intro")
+  }
 
   return (
     <div className="flex flex-col min-h-screen bg-background">
@@ -63,9 +92,16 @@ export function HomeScreen() {
       {/* Footer */}
       <footer className="p-6 text-center">
         <p className="text-xs text-muted-foreground/50">
-          Based on the Wheel of Consent by Betty Martin
+          {t("footerText")}
         </p>
       </footer>
+
+      {hasCheckedOnboarding && showOnboarding ? (
+        <FirstRunOnboarding
+          onLearnBasics={handleLearnBasics}
+          onSkip={handleSkipToGame}
+        />
+      ) : null}
     </div>
   )
 }

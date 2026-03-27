@@ -1,6 +1,6 @@
 export type Locale = "en" | "de" | "fr" | "es" | "pt"
 
-export const defaultLocale: Locale = "en"
+export const defaultLocale: Locale = "de"
 
 export const localeNames: Record<Locale, string> = {
   en: "English",
@@ -195,10 +195,18 @@ export const translations = {
     welcomeSubtitle: "Eine einfache Übung, um Berührung, Einverständnis und Verbindung mit einem Partner zu erkunden",
     startGame: "Spiel starten",
     learnMore: "Grundlagen lernen",
+    onboardingWelcomeTitle: "Schön, dass ihr da seid.",
+    onboardingWelcomeBody: "Willkommen im 3-Minuten-Spiel. Diese Praxis wird besonders kraftvoll, wenn ihr euch zuerst mit den Grundlagen vertraut macht.",
+    onboardingWheelHint: "Falls euch das Wheel of Consent noch nicht vertraut ist, nehmt euch bitte zuerst Zeit für die Anleitung. So startet ihr sicher, klar und mit mehr Freude.",
+    onboardingLearnCta: "Grundlagen jetzt lesen",
+    onboardingSkipCta: "Direkt zum Spiel",
 
     // Educational Content
-    wheelOfConsentTitle: "Das Rad des Einverständnisses",
+    wheelOfConsentTitle: "Konsens-Rad",
     wheelOfConsentDesc: "Das Rad des Einverständnisses hilft uns zu verstehen, wer handelt und für wen es ist.",
+    learnWelcomeTitle: "Grundlagen, die den Unterschied machen",
+    learnWelcomeBody: "Das 3-Minuten-Spiel lebt nicht von Technik, sondern von Klarheit, Präsenz und echter Wahl. Je besser ihr die Grundlagen versteht, desto freier und angenehmer wird eure Erfahrung.",
+    learnTwoQuestionsHelp: "Diese beiden Fragen öffnen zwei unterschiedliche Dynamiken. Achtet bei jeder Antwort bewusst darauf, für wen die Berührung in diesem Moment ist.",
     twoQuestions: "Zwei Fragen",
     question1: "Wie möchtest du, dass ich dich berühre?",
     question1Desc: "Dies erzeugt die Dienen/Annehmen-Dynamik",
@@ -314,6 +322,33 @@ export const translations = {
     // Practice Reminders
     practiceReminder: "Übungstipp",
     practiceReminderText: "Spiele das Spiel regelmäßig über Wochen als separate Übung, nicht als Vorspiel zu Intimität. Betrachte es mit Neugier als ein Experiment.",
+    learnSelectedRole: "Aktiv ausgewählte Rolle",
+    learnWheelWhoActs: "Wer handelt:",
+    learnWheelForWhom: "Für wen ist es:",
+    learnWheelGiftLabel: "Das Geschenk:",
+    learnWheelYouAct: "Du handelst aktiv.",
+    learnWheelPartnerActs: "Die andere Person handelt aktiv.",
+    learnWheelForYou: "Die Berührung ist für dich.",
+    learnWheelForPartner: "Die Berührung ist für die andere Person.",
+    learnWheelAnchorServe: "Ich tue es für dich.",
+    learnWheelAnchorAccept: "Du tust es für mich.",
+    learnWheelAnchorTake: "Ich tue es für mich.",
+    learnWheelAnchorAllow: "Du tust es für dich.",
+    learnWheelGiftServe: "Deine Handlung und Aufmerksamkeit, ohne eigene Agenda.",
+    learnWheelGiftAccept: "Dein klares Empfangen dessen, was du wirklich möchtest.",
+    learnWheelGiftTake: "Der Zugang zum Körper der anderen Person, innerhalb klarer Grenzen.",
+    learnWheelGiftAllow: "Der bewusste Zugang zu deinem Körper als freiwilliges Geschenk.",
+    learnWheelAxisActionTitle: "Achse: Wer handelt?",
+    learnWheelAxisActionBody: "Unterscheidet zwischen: Ich tue etwas oder die andere Person tut etwas.",
+    learnWheelAxisBenefitTitle: "Achse: Für wen ist es?",
+    learnWheelAxisBenefitBody: "Unterscheidet zwischen: Es ist für mich oder für die andere Person.",
+    learnPrinciplesIntro: "Die Qualität eurer Erfahrung wächst, wenn ihr diese Prinzipien während des Spiels aktiv erinnert.",
+    learnPrinciplePleasureTitle: "Dem Vergnügen folgen",
+    learnPrinciplePleasureBody: "Genuss ist ein physiologischer Zustand. Ihr könnt ihn nicht erzwingen, aber ihr könnt langsamer werden, spüren und ihm folgen.",
+    learnPrinciplePresenceTitle: "Präsenz vor Technik",
+    learnPrinciplePresenceBody: "Gute Berührung entsteht aus Achtsamkeit, entspannten Händen und klarer Kommunikation - nicht aus perfekter Technik.",
+    learnPracticeTitle: "So übt ihr nachhaltig",
+    learnPracticeBody: "Übt die Rollen in der vorgesehenen Reihenfolge und wiederholt sie regelmäßig. Das Spiel ist eine eigene Praxis und kein Leistungscheck.",
 
     // Common
     continue: "Weiter",
@@ -747,10 +782,12 @@ export const translations = {
   },
 } as const
 
-export type TranslationKey = keyof typeof translations.en
+export type TranslationKey = keyof typeof translations.de
 
 export function getTranslation(locale: Locale, key: TranslationKey): string {
-  return translations[locale][key]
+  const localized = translations[locale] as Partial<Record<TranslationKey, string>>
+  const german = translations.de as Record<TranslationKey, string>
+  return localized[key] ?? german[key] ?? String(key)
 }
 
 export const allLocales: Locale[] = ["en", "de", "fr", "es", "pt"]

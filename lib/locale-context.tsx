@@ -1,7 +1,7 @@
 "use client"
 
 import { createContext, useContext, useState, useCallback, useEffect, type ReactNode } from "react"
-import { type Locale, defaultLocale, translations, type TranslationKey, allLocales } from "./i18n"
+import { type Locale, defaultLocale, getTranslation, type TranslationKey, allLocales } from "./i18n"
 
 interface LocaleContextType {
   locale: Locale
@@ -53,7 +53,7 @@ export function LocaleProvider({ children }: { children: ReactNode }) {
 
   const t = useCallback(
     (key: TranslationKey) => {
-      return translations[locale][key]
+      return getTranslation(locale, key)
     },
     [locale]
   )
